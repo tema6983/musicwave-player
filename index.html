@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>MusicWave - Продвинутый плеер</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+    <!-- Модальное окно авторизации -->
+    <div class="modal" id="auth-modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <div class="auth-tabs">
+                <button class="tab-btn active" data-tab="login">Вход</button>
+                <button class="tab-btn" data-tab="register">Регистрация</button>
+            </div>
+            <div class="auth-form active" id="login-form">
+                <h3>Вход в аккаунт</h3>
+                <div class="input-group">
+                    <input id="login-email" placeholder="Email" type="email"/>
+                </div>
+                <div class="input-group">
+                    <input id="login-password" placeholder="Пароль" type="password"/>
+                    <i class="far fa-eye toggle-password" data-target="login-password"></i>
+                </div>
+                <button id="login-btn">Войти</button>
+                <p class="auth-error" id="login-error"></p>
+            </div>
+            <div class="auth-form" id="register-form">
+                <h3>Создать аккаунт</h3>
+                <div class="input-group">
+                    <input id="register-name" placeholder="Имя" type="text"/>
+                </div>
+                <div class="input-group">
+                    <input id="register-email" placeholder="Email" type="email"/>
+                </div>
+                <div class="input-group">
+                    <input id="register-password" placeholder="Пароль (мин. 6 символов)" type="password"/>
+                    <i class="far fa-eye toggle-password" data-target="register-password"></i>
+                </div>
+                <button id="register-btn">Зарегистрироваться</button>
+                <p class="auth-error" id="register-error"></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно жанров -->
+    <div class="modal" id="genres-modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <div class="genres-header">
+                <h2>Выберите жанр</h2>
+                <div class="search-genres">
+                    <i class="fas fa-search"></i>
+                    <input id="genre-search" placeholder="Поиск жанра..." type="text"/>
+                </div>
+            </div>
+            <div class="genres-container" id="genres-container"></div>
+            <div class="genre-tracks" id="genre-tracks" style="display:none">
+                <button class="back-button" id="back-to-genres">
+                    <i class="fas fa-arrow-left"></i> Все жанры
+                </button>
+                <h3 id="current-genre-name"></h3>
+                <div class="track-list" id="genre-tracks-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">MusicWave</div>
+        <nav>
+            <a class="active" href="#"><i class="fas fa-home"></i> <span>Главная</span></a>
+            <a href="#" id="search-toggle"><i class="fas fa-search"></i> <span>Поиск</span></a>
+            <a href="#" id="genres-toggle"><i class="fas fa-music"></i> <span>Жанры</span></a>
+        </nav>
+        
+        <div class="search-container" id="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input id="search-input" placeholder="Поиск треков..." type="text"/>
+            <div class="search-results" id="search-results"></div>
+        </div>
+        
+        <div class="header-controls">
+            <button id="theme-toggle" title="Сменить тему"><i class="fas fa-moon"></i></button>
+            <div id="user-auth">
+                <button id="auth-btn"><i class="fas fa-user"></i> Войти</button>
+            </div>
+            <div id="user-profile" style="display: none;">
+                <div class="user-avatar" id="user-avatar"></div>
+                <div class="user-menu">
+                    <span id="username-display"></span>
+                    <button id="profile-btn"><i class="fas fa-user"></i> Профиль</button>
+                    <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="popular-tracks">
+            <h2>Популярные треки</h2>
+            <div class="track-list" id="popular-tracks"></div>
+        </section>
+        
+        <section class="user-playlists">
+            <div class="playlist-header">
+                <h2>Мои плейлисты</h2>
+                <button id="create-playlist-btn"><i class="fas fa-plus"></i> Создать</button>
+            </div>
+            <div class="playlist-grid" id="user-playlists-container"></div>
+        </section>
+        
+        <section class="profile-section" id="profile-section">
+            <button class="back-button" id="back-from-profile">
+                <i class="fas fa-arrow-left"></i> Назад
+            </button>
+            <div class="profile-header">
+                <div class="profile-avatar" id="profile-avatar">A</div>
+                <div class="profile-info">
+                    <h2 id="profile-username">Имя пользователя</h2>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="tracks-listened">0</div>
+                            <div class="stat-label">Треков</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="playlists-created">0</div>
+                            <div class="stat-label">Плейлистов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="achievements-earned">0/10</div>
+                            <div class="stat-label">Достижения</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="achievements-section">
+                <h3>Достижения</h3>
+                <div class="achievements-grid" id="achievements-grid"></div>
+            </div>
+        </section>
+    </main>
+    
+    <div class="player-section">
+        <div class="now-playing">
+            <img alt="Обложка" id="current-cover" src="https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228"/>
+            <div class="track-info">
+                <h3 id="current-title">Название трека</h3>
+                <p id="current-artist">Исполнитель</p>
+            </div>
+            <button id="like-btn" title="Добавить в избранное"><i class="far fa-heart"></i></button>
+        </div>
+        <div class="player-controls">
+            <div class="controls">
+                <button id="shuffle-btn" title="Перемешать"><i class="fas fa-random"></i></button>
+                <button id="prev-btn" title="Предыдущий"><i class="fas fa-step-backward"></i></button>
+                <button id="play-btn" title="Воспроизвести"><i class="fas fa-play"></i></button>
+                <button id="next-btn" title="Следующий"><i class="fas fa-step-forward"></i></button>
+                <button id="repeat-btn" title="Повтор"><i class="fas fa-redo"></i></button>
+            </div>
+            <div class="progress-container">
+                <span id="current-time">0:00</span>
+                <input id="progress-bar" title="Прогресс" type="range" value="0"/>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+        <div class="volume-controls">
+            <button id="volume-btn" title="Громкость"><i class="fas fa-volume-up" id="volume-icon"></i></button>
+            <input id="volume-slider" max="100" min="0" title="Уровень громкости" type="range" value="70"/>
+        </div>
+    </div>
+    
+    <!-- Модальные окна -->
+    <div class="modal" id="playlist-modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h3>Создать плейлист</h3>
+            <input id="playlist-name" placeholder="Название" type="text"/>
+            <button id="save-playlist-btn">Создать</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="add-track-modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h3>Добавить трек в <span id="modal-playlist-name"></span></h3>
+            <div class="track-carousel" id="available-tracks"></div>
+            <div class="carousel-nav" id="carousel-nav"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
